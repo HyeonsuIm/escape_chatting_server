@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using RoomChattingServer.TCPIPCummunication;
 using System.Threading;
 using System.Media;
+using System.Text;
 
 namespace RoomChattingServer
 {
@@ -50,7 +51,7 @@ namespace RoomChattingServer
                 clientSocket = tcpListener.AcceptTcpClient();
 
                 TCPIPClientHandler handler = new TCPIPClientHandler(clientSocket, this);
-                handler.OnReceived += new TCPIPClientHandler.MessageDisplayHandler(displayText);
+                handler.OnReceived += new TCPIPClientHandler.MessageDisplayHandler(receiveText);
                 handler.onNameChanged += new TCPIPClientHandler.AddNameHandler(addName);
                 handler.exitChat += new TCPIPClientHandler.ExitChatHandler(exitChat);
                 handlerList.Add(handler);
@@ -59,12 +60,14 @@ namespace RoomChattingServer
             }
         }
 
-        public void displayText(string text, string name)
+        public void receiveText(string text, string name)
         {
             m_mainForm.addTextBox(text, name, System.Drawing.Color.White);
             m_mainForm.markTextBox(name);
             SoundPlayer simpleSound = new SoundPlayer(Properties.Resources.door_slam);
             simpleSound.Play();
+
+            SaveText(name, text);
         }
 
         private void sendErrorCode(string name, string error)
@@ -107,7 +110,7 @@ namespace RoomChattingServer
             }
             if( false == isSended)
             {
-                displayText("메세지 전송이 실패하였습니다.", name);
+                receiveText("메세지 전송이 실패하였습니다.", name);
             }
         }
 
@@ -139,6 +142,13 @@ namespace RoomChattingServer
         public List<string> getMessageListFromName(string name)
         {
             return m_mainForm.getMessageList(name);
+        }
+
+        public void saveText(string name, string text)
+        {
+            StreamWriter sw = new StreamWriter(name + ".txt", false, Encoding.GetEncoding("euc-kr"));
+            sw.WriteLine(text);
+            sw.Close();
         }
     }
 }
