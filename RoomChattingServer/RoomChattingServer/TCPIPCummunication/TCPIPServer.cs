@@ -67,7 +67,7 @@ namespace RoomChattingServer
             SoundPlayer simpleSound = new SoundPlayer(Properties.Resources.door_slam);
             simpleSound.Play();
 
-            SaveText(name, text);
+            saveText(name, text);
         }
 
         private void sendErrorCode(string name, string error)
@@ -146,8 +146,8 @@ namespace RoomChattingServer
 
         public void saveText(string name, string text)
         {
-            StreamWriter sw = new StreamWriter(name + ".txt", false, Encoding.GetEncoding("euc-kr"));
-            sw.WriteLine(text);
+            StreamWriter sw = new StreamWriter(name + ".txt", true, Encoding.Default);
+            sw.WriteLine(System.DateTime.Now.ToString("yy/MM/dd HH.mm.ss") + " : " + text);
             sw.Close();
         }
     }
